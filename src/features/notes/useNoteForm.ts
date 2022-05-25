@@ -1,0 +1,3 @@
+const useNoteForm = () => {};
+
+export { useNoteForm };
