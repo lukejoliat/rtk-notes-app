@@ -1,13 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 
-const useForm = (props: FormProps) => {
-  const fields = useRef<any>({
+const useForm = (props: FormProps, editValuePresent?: boolean) => {
+  const fields = useRef<Form>({
     valid: false,
     invalidFields: [],
+    fields: {},
   });
   const [values, setValues] = useState<Map<string, string>>(new Map());
 
   const submit = () => props.onSubmit(fields.current);
+
+  const initialize = () => {
+    for (let field of props.fields) {
+      fields.current.fields[field.id] = {
+        ...field,
+        value: field.value ? field.value : "",
+        valid: true,
+        onChange: handleChange,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      field.required ? fields.current.invalidFields.push(field.id) : null;
+      values.set(field.id, "");
+    }
+    setValues(new Map(values));
+  };
+
   const isValid = (field: InternalField) => {
     if (
       field.required &&
@@ -34,7 +51,7 @@ const useForm = (props: FormProps) => {
     const {
       currentTarget: { id, value },
     } = event;
-    const field: InternalField = fields.current[id];
+    const field: InternalField = fields.current.fields[id];
     field.value = value;
     if (!isValid(field)) {
       invalidate(field);
@@ -46,10 +63,11 @@ const useForm = (props: FormProps) => {
 
   const reset = () => {
     for (let field of props.fields) {
-      fields.current[field.id] = {
+      fields.current.fields[field.id] = {
         ...field,
         value: "",
         valid: true,
+        onChange: handleChange,
       };
       fields.current.invalidFields.push(field.id);
       fields.current.valid = false;
@@ -58,22 +76,18 @@ const useForm = (props: FormProps) => {
   };
 
   useEffect(() => {
-    for (let field of props.fields) {
-      fields.current[field.id] = {
-        ...field,
-        value: "",
-        valid: true,
-        onChange: handleChange,
-      };
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      field.required ? fields.current.invalidFields.push(field.id) : null;
-      values.set(field.id, "");
-    }
-    setValues(new Map(values));
+    initialize();
   }, []);
 
+  useEffect(() => {
+    if (editValuePresent === true) {
+      fields.current.valid = true;
+      initialize();
+    }
+  }, [editValuePresent, initialize]);
+
   return {
-    ...fields.current,
+    ...fields.current.fields,
     submit,
     handleChange,
     reset,
@@ -86,17 +100,24 @@ interface Field {
   required: boolean;
   type: string;
   placeholder?: string;
+  value?: string | number;
 }
 
 interface InternalField extends Field {
   value: string | number;
   valid: boolean;
-  onChange: () => any;
+  onChange: (event: React.FormEvent<HTMLInputElement>) => void;
 }
 
 interface FormProps {
   onSubmit: (input: any) => any;
   fields: Field[];
+}
+
+interface Form {
+  valid: boolean;
+  invalidFields: string[];
+  fields: any;
 }
 
 export default useForm;

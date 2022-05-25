@@ -8,36 +8,19 @@ import {
   AlertDescription,
   FormControl,
 } from "@chakra-ui/react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import useInput from "../../hooks/useInput";
-import { useEditPostMutation, useGetPostQuery } from "../api/notes";
+import { useParams } from "react-router-dom";
+import { useEditNoteForm } from "./useEditNoteForm";
 
 const EditNoteForm = () => {
   const { id } = useParams();
-  const [editNote, { isLoading, isError }] = useEditPostMutation();
-  const {
-    data: note,
-    isLoading: noteLoading,
-    isError: noteError,
-  } = useGetPostQuery(id || "");
-  const title = useInput(note?.title);
-  const content = useInput(note?.content);
-  const invalid = title.value === "";
-  const handleSubmit = () => {
-    if (!invalid) {
-      editNote({
-        id: `${note?.id}`,
-        title: `${title.value}`,
-        content: `${content.value}`,
-      }).unwrap();
-      navigate(`/view/${note?.id}`);
-    }
-  };
-  const navigate = useNavigate();
+  const { submit, title, content, isLoading, isError, valid } = useEditNoteForm(
+    id || ""
+  );
+  console.log("form rendered!");
   return (
     <>
       <Heading>Edit Note</Heading>
-      <form>
+      <form onSubmit={submit}>
         {isError ? (
           <Alert status="error" mb={2}>
             <AlertIcon />
@@ -47,25 +30,13 @@ const EditNoteForm = () => {
             </AlertDescription>
           </Alert>
         ) : null}
-        {noteLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <>
-            <FormControl isInvalid={invalid}>
-              <Input
-                required
-                placeholder="title"
-                type="text"
-                {...title}
-                mb={2}
-              />
-            </FormControl>
-            <Input placeholder="content" type="text" {...content} mb={2} />
-            <Button isLoading={isLoading} type="button" onClick={handleSubmit}>
-              Save
-            </Button>
-          </>
-        )}
+        <FormControl isInvalid={title ? !title.valid : false}>
+          <Input {...title} mb={2} />
+        </FormControl>
+        <Input {...content} mb={2} />
+        <Button isLoading={isLoading} onClick={submit} disabled={!valid}>
+          Save
+        </Button>
       </form>
     </>
   );

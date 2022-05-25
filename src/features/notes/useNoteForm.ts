@@ -1,3 +1,0 @@
-const useNoteForm = () => {};
-
-export { useNoteForm };
