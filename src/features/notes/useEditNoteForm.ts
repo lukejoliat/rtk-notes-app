@@ -11,29 +11,31 @@ const useEditNoteForm = (id: string) => {
   } = useGetPostQuery(id);
   const [editPost, { isLoading, isError }] = useEditPostMutation();
   const navigate = useNavigate();
-  const { submit, title, content, reset, valid } = useForm(
-    {
-      onSubmit: (data) => {
-        if (!title.valid) {
-          return;
-        } else {
-          editPost({ id, title: title.value, content: content.value }).unwrap();
-          navigate(`/view/${note?.id}`);
-        }
-      },
-      fields: [
-        {
-          id: "title",
-          type: "text",
-          required: true,
-          placeholder: "title...",
-          value: note?.title,
-        },
-        { id: "content", type: "text", required: false, value: note?.content },
-      ],
+  const { submit, title, content, reset, valid } = useForm({
+    onSubmit: ({ fields: { title, content } }) => {
+      if (!title.valid) {
+        return;
+      } else {
+        editPost({
+          id,
+          title: title.value,
+          content: content.value,
+        }).unwrap();
+        navigate(`/view/${note?.id}`);
+      }
     },
-    isSuccess
-  );
+    fields: [
+      {
+        id: "title",
+        type: "text",
+        required: true,
+        placeholder: "title...",
+        value: note?.title,
+      },
+      { id: "content", type: "text", required: false, value: note?.content },
+    ],
+    editValuePresent: isSuccess,
+  });
   return {
     submit,
     title,

@@ -13,10 +13,8 @@ import { useCreateNoteform } from "./useCreateNoteForm";
 const CreateNoteForm = () => {
   const { submit, title, content, isLoading, isError, valid } =
     useCreateNoteform();
-  console.log("form rendered!");
   return (
     <>
-      <Heading>Create a Note</Heading>
       <form onSubmit={submit}>
         {isError ? (
           <Alert status="error" mb={2}>

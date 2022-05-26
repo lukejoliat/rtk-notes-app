@@ -1,29 +1,47 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-const useForm = (props: FormProps, editValuePresent?: boolean) => {
-  const fields = useRef<Form>({
-    valid: false,
-    invalidFields: [],
-    fields: {},
-  });
-  const [values, setValues] = useState<Map<string, string>>(new Map());
+const useForm = ({ fields, editValuePresent, onSubmit }: FormProps) => {
+  const [, forceUpdate] = useState(Date.now());
 
-  const submit = () => props.onSubmit(fields.current);
+  const _update = useCallback(() => forceUpdate(Date.now()), []);
 
-  const initialize = () => {
-    for (let field of props.fields) {
-      fields.current.fields[field.id] = {
-        ...field,
-        value: field.value ? field.value : "",
-        valid: true,
-        onChange: handleChange,
-      };
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      field.required ? fields.current.invalidFields.push(field.id) : null;
-      values.set(field.id, "");
-    }
-    setValues(new Map(values));
-  };
+  const handleChange = useCallback(
+    (event: React.FormEvent<HTMLInputElement>) => {
+      const {
+        currentTarget: { id, value },
+      } = event;
+      const field: InternalField = form.current.fields[id];
+      field.value = value;
+      if (!isValid(field)) {
+        invalidate(field);
+      } else {
+        validate(field);
+      }
+      _update();
+    },
+    [_update]
+  );
+  const initialize = useCallback(
+    (vals: any) => {
+      const form: Form = { valid: false, invalidFields: [], fields: [] };
+      for (let field of vals) {
+        form.fields[field.id] = {
+          ...field,
+          value: field.value ? field.value : "",
+          valid: true,
+          onChange: handleChange,
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        field.required ? form.invalidFields.push(field.id) : null;
+      }
+      return form;
+    },
+    [handleChange]
+  );
+
+  const form = useRef<Form>(initialize(fields));
+
+  const submit = useCallback(() => onSubmit(form.current), [onSubmit]);
 
   const isValid = (field: InternalField) => {
     if (
@@ -33,65 +51,48 @@ const useForm = (props: FormProps, editValuePresent?: boolean) => {
       return false;
     return true;
   };
+
   const invalidate = (field: InternalField) => {
     field.valid = false;
-    fields.current.invalidFields.push(field.id);
-    fields.current.valid = false;
+    form.current.invalidFields.push(field.id);
+    form.current.valid = false;
   };
 
   const validate = (field: InternalField) => {
     field.valid = true;
-    fields.current.invalidFields = fields.current.invalidFields.filter(
+    form.current.invalidFields = form.current.invalidFields.filter(
       (f: string) => f !== field.id
     );
-    if (fields.current.invalidFields.length <= 0) fields.current.valid = true;
+    if (form.current.invalidFields.length <= 0) form.current.valid = true;
   };
 
-  const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
-    const {
-      currentTarget: { id, value },
-    } = event;
-    const field: InternalField = fields.current.fields[id];
-    field.value = value;
-    if (!isValid(field)) {
-      invalidate(field);
-    } else {
-      validate(field);
-    }
-    setValues((map) => new Map(map.set(id, value)));
-  };
-
-  const reset = () => {
-    for (let field of props.fields) {
-      fields.current.fields[field.id] = {
+  const reset = useCallback(() => {
+    for (let field of form.current.fields) {
+      form.current.fields[field.id] = {
         ...field,
         value: "",
         valid: true,
         onChange: handleChange,
       };
-      fields.current.invalidFields.push(field.id);
-      fields.current.valid = false;
+      form.current.invalidFields.push(field.id);
+      form.current.valid = false;
     }
-    setValues(new Map());
-  };
-
-  useEffect(() => {
-    initialize();
-  }, []);
+  }, [handleChange]);
 
   useEffect(() => {
     if (editValuePresent === true) {
-      fields.current.valid = true;
-      initialize();
+      form.current = initialize(fields);
+      form.current.valid = true;
+      _update();
     }
   }, [editValuePresent, initialize]);
 
   return {
-    ...fields.current.fields,
+    ...form.current.fields,
     submit,
     handleChange,
     reset,
-    valid: fields.current.valid,
+    valid: form.current.valid,
   };
 };
 
@@ -112,6 +113,7 @@ interface InternalField extends Field {
 interface FormProps {
   onSubmit: (input: any) => any;
   fields: Field[];
+  editValuePresent?: boolean;
 }
 
 interface Form {

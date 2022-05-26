@@ -1,8 +1,7 @@
-import { Text } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { EditIcon } from "@chakra-ui/icons";
+import { Button, HStack, Text } from "@chakra-ui/react";
+import { Link, useParams } from "react-router-dom";
 import { useGetPostQuery } from "../features/api/notes";
-import PostCount from "../features/notes/PostCount";
-
 const NoteDetail = () => {
   const { id } = useParams();
   const { data: note, isError, error, isLoading } = useGetPostQuery(id || "");
@@ -12,14 +11,19 @@ const NoteDetail = () => {
   else
     return (
       <>
+        <HStack>
+          <Text>
+            <strong>Title: </strong>
+            {note?.title}
+          </Text>
+          <Button as={Link} to={`/edit/${note?.id}`}>
+            <EditIcon />{" "}
+          </Button>
+        </HStack>
         <Text>
-          <strong>Title: </strong>
-          {note?.title}
-        </Text>
-        <p>
           <strong>Content: </strong>
           {note?.content}
-        </p>
+        </Text>
       </>
     );
 };

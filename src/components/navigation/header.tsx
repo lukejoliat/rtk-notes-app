@@ -7,7 +7,7 @@ interface HeaderProps {
 
 const Header: FC<HeaderProps> = ({ children }) => {
   return (
-    <Box as="header" p={2}>
+    <Box as="header" p={2} bg="blue.900">
       {children}
     </Box>
   );
