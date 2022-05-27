@@ -1,10 +1,9 @@
-import { EditIcon } from "@chakra-ui/icons";
-import { Button, Heading, HStack, Text, VStack } from "@chakra-ui/react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetPostQuery } from "../features/api/notes";
+import { Button, Heading, Text } from "@chakra-ui/react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useGetNoteQuery } from "../features/api/notes";
 const NoteDetail = () => {
   const { id } = useParams();
-  const { data: note, isError, error, isLoading } = useGetPostQuery(id || "");
+  const { data: note, isError, error, isLoading } = useGetNoteQuery(id || "");
   const naviate = useNavigate();
 
   if (isLoading) return <div>Loading...</div>;

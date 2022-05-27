@@ -1,12 +1,11 @@
 import React from "react";
 // import "./App.css";
-import { Link, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Notes from "./routes/Notes";
 import NoteDetail from "./routes/NoteDetail";
-import CreateNoteForm from "./features/notes/CreateNoteForm";
-import Nav from "./components/navigation/nav";
+import Nav from "./components/navigation/Nav";
 import { Box, Container } from "@chakra-ui/react";
-import Header from "./components/navigation/header";
+import Header from "./components/navigation/Header";
 
 import EditNote from "./routes/EditNote";
 import CreateNote from "./routes/CreateNote";

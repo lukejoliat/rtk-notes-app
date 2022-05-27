@@ -1,5 +1,5 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
-import React, { FC, ReactNode } from "react";
+import { Heading, Text, VStack } from "@chakra-ui/react";
+import React, { FC } from "react";
 
 interface CardHeaderProps {
   heading: string;

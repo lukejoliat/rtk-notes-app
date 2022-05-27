@@ -1,7 +1,5 @@
 // Import the RTK Query methods from the React-specific entry point
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { useEffect, useState } from "react";
-import { NotEmittedStatement } from "typescript";
 import { Note } from "../../routes/Notes";
 
 interface User {
@@ -17,55 +15,54 @@ export const apiSlice = createApi({
   // The "endpoints" represent operations and requests for this server
   tagTypes: ["Note", "User"],
   endpoints: (builder) => ({
-    // The `getPosts` endpoint is a "query" operation that returns data
-    getPosts: builder.query<Note[], void>({
-      // The URL for the request is '/fakeApi/posts'
+    // The `getNotes` endpoint is a "query" operation that returns data
+    getNotes: builder.query<Note[], void>({
       query: () => "/notes",
       providesTags: (result = [], error, arg) =>
         result
           ? ["Note", ...result.map(({ id }) => ({ type: "Note" as const, id }))]
           : ["Note"],
     }),
-    getPostsAndUsers: builder.query<{ notes: Note[]; users: User[] }, void>({
+    getNotesAndUsers: builder.query<{ notes: Note[]; users: User[] }, void>({
       async queryFn(_arg, _queryApi, _extraOptions, fetchWithBQ) {
         const users = await fetchWithBQ("/users");
-        const posts = await fetchWithBQ("/notes");
+        const notes = await fetchWithBQ("/notes");
         return {
           data: {
             users: users.data as User[],
-            notes: posts.data as Note[],
+            notes: notes.data as Note[],
           },
         };
       },
       providesTags: ["Note", "User"],
     }),
-    getPost: builder.query<Note, string>({
-      // The URL for the request is '/fakeApi/posts'
+    getNote: builder.query<Note, string>({
+      // The URL for the request is '/fakeApi/notes'
       query: (id) => `/notes/${id}`,
       providesTags: (result, error, arg) => [{ type: "Note", id: arg }],
     }),
-    createPost: builder.mutation<Note, Note>({
-      // The URL for the request is '/fakeApi/posts'
+    createNote: builder.mutation<Note, Note>({
+      // The URL for the request is '/fakeApi/notes'
       query: (note) => ({
         url: `/notes`,
         method: "POST",
-        // Include the entire post object as the body of the request
+        // Include the entire note object as the body of the request
         body: note,
       }),
       invalidatesTags: ["Note"],
     }),
-    editPost: builder.mutation<Note, Note>({
-      // The URL for the request is '/fakeApi/posts'
+    editNote: builder.mutation<Note, Note>({
+      // The URL for the request is '/fakeApi/notes'
       query: (note) => ({
         url: `/notes/${note.id}`,
         method: "PUT",
-        // Include the entire post object as the body of the request
+        // Include the entire note object as the body of the request
         body: note,
       }),
       invalidatesTags: (result, error, arg) => [{ type: "Note", id: arg.id }],
     }),
-    deletePost: builder.mutation<Note, string>({
-      // The URL for the request is '/fakeApi/posts'
+    deleteNote: builder.mutation<Note, string>({
+      // The URL for the request is '/fakeApi/notes'
       query: (id) => ({
         url: `/notes/${id}`,
         method: "DELETE",
@@ -75,18 +72,18 @@ export const apiSlice = createApi({
   }),
 });
 
-// Export the auto-generated hook for the `getPosts` query endpoint
+// Export the auto-generated hook for the `getNotes` query endpoint
 export const {
-  useGetPostsQuery,
-  useGetPostQuery,
-  useCreatePostMutation,
-  useEditPostMutation,
-  useDeletePostMutation,
-  useGetPostsAndUsersQuery,
+  useGetNotesQuery,
+  useGetNoteQuery,
+  useCreateNoteMutation,
+  useEditNoteMutation,
+  useDeleteNoteMutation,
+  useGetNotesAndUsersQuery,
 } = apiSlice;
-// export const { useGetPostsQuery } = {
-//   useGetPostsQuery: () => {
-//     const [posts, setPosts] = useState<Note[]>([]);
+// export const { useGetNotesQuery } = {
+//   useGetNotesQuery: () => {
+//     const [notes, setNotes] = useState<Note[]>([]);
 //     const [error, setError] = useState<String | null>(null);
 //     const [loading, setLoading] = useState<Boolean>(false);
 //     const [success, setSuccess] = useState<Boolean>(false);
@@ -94,8 +91,8 @@ export const {
 //       setLoading(true);
 //       fetch("http://localhost:3000/notes")
 //         .then((res) => res.json())
-//         .then((posts) => {
-//           setPosts(posts);
+//         .then((notes) => {
+//           setNotes(notes);
 //           setSuccess(true);
 //         })
 //         .then(() => setSuccess(true))
@@ -106,7 +103,7 @@ export const {
 //         .finally(() => setLoading(false));
 //     }, []);
 //     return {
-//       data: posts,
+//       data: notes,
 //       error,
 //       isError: Boolean(error),
 //       isLoading: loading,

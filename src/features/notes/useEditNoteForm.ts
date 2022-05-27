@@ -4,7 +4,7 @@ import useForm, {
   InternalFieldText,
   InternalFieldTextArea,
 } from "../../hooks/useForm";
-import { useEditPostMutation, useGetPostQuery } from "../api/notes";
+import { useEditNoteMutation, useGetNoteQuery } from "../api/notes";
 
 interface EditNoteFormResponse extends FormResponse {
   isError: boolean;
@@ -21,8 +21,8 @@ const useEditNoteForm = (id: string) => {
     isLoading: noteLoading,
     isError: noteError,
     isSuccess,
-  } = useGetPostQuery(id);
-  const [editPost, { isLoading, isError }] = useEditPostMutation();
+  } = useGetNoteQuery(id);
+  const [editPost, { isLoading, isError }] = useEditNoteMutation();
   const navigate = useNavigate();
   const { submit, title, content, reset, valid } = useForm({
     onSubmit: ({ fields: { title, content } }) => {

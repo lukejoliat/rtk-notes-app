@@ -4,7 +4,7 @@ import useForm, {
   InternalFieldText,
   InternalFieldTextArea,
 } from "../../hooks/useForm";
-import { useCreatePostMutation } from "../api/notes";
+import { useCreateNoteMutation } from "../api/notes";
 
 interface CreateNoteFormResponse extends FormResponse {
   isError: boolean;
@@ -14,7 +14,7 @@ interface CreateNoteFormResponse extends FormResponse {
 }
 
 const useCreateNoteform = (): CreateNoteFormResponse => {
-  const [addPost, { isLoading, isError }] = useCreatePostMutation();
+  const [addPost, { isLoading, isError }] = useCreateNoteMutation();
   const navigate = useNavigate();
 
   const { submit, title, content, reset, valid } = useForm({

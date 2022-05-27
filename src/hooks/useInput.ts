@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
-const useInput = (initialValue: string | number | undefined) => {
+const useInput = (
+  initialValue: string | number | undefined
+): {
+  value: string | number | undefined;
+  onChange: (event: React.FormEvent<HTMLInputElement>) => void;
+  reset: () => void;
+} => {
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => setValue(initialValue), [initialValue]);
@@ -21,4 +27,5 @@ const useInput = (initialValue: string | number | undefined) => {
   };
 };
 
+export type UseInputReturn = ReturnType<typeof useInput>;
 export default useInput;

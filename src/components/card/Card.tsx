@@ -1,4 +1,4 @@
-import { Box, BoxProps, styled } from "@chakra-ui/react";
+import { Box, BoxProps } from "@chakra-ui/react";
 import React, { FC, ReactNode } from "react";
 
 interface CardProps extends BoxProps {
