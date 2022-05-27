@@ -7,21 +7,21 @@ import {
   AlertTitle,
   AlertDescription,
   FormControl,
-  useForceUpdate,
+  Textarea,
+  Box,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { useEditNoteForm } from "./useEditNoteForm";
+import { useEditNoteForm } from "../features/notes/useEditNoteForm";
 
-const EditNoteForm = () => {
+const EditNote = () => {
   const { id } = useParams();
   const { submit, title, content, isLoading, isError, valid } = useEditNoteForm(
     id || ""
   );
-  console.log("form rendered!");
   return (
     <>
       <Heading>Edit Note</Heading>
-      <form onSubmit={submit}>
+      <Box as="form" onSubmit={submit}>
         {isError ? (
           <Alert status="error" mb={2}>
             <AlertIcon />
@@ -34,13 +34,13 @@ const EditNoteForm = () => {
         <FormControl isInvalid={title ? !title.valid : false}>
           <Input {...title} mb={2} />
         </FormControl>
-        <Input {...content} mb={2} />
+        <Textarea {...content} mb={2} />
         <Button isLoading={isLoading} onClick={submit} disabled={!valid}>
           Save
         </Button>
-      </form>
+      </Box>
     </>
   );
 };
 
-export default EditNoteForm;
+export default EditNote;

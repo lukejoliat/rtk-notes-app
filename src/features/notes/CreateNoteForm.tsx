@@ -1,12 +1,12 @@
 import {
   Button,
   Input,
-  Heading,
   Alert,
   AlertIcon,
   AlertTitle,
   AlertDescription,
   FormControl,
+  Textarea,
 } from "@chakra-ui/react";
 import { useCreateNoteform } from "./useCreateNoteForm";
 
@@ -28,7 +28,7 @@ const CreateNoteForm = () => {
         <FormControl isInvalid={title ? !title.valid : false}>
           <Input {...title} mb={2} />
         </FormControl>
-        <Input {...content} mb={2} />
+        <Textarea {...content} mb={2} />
         <Button isLoading={isLoading} onClick={submit} disabled={!valid}>
           Add Post
         </Button>

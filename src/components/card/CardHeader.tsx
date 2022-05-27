@@ -11,7 +11,7 @@ const CardHeader: FC<CardHeaderProps> = ({ heading, subheading }) => {
     <VStack align={"left"}>
       <Heading size="md">{heading}</Heading>
       <Heading as="h3" size="sm">
-        {subheading}
+        <Text as="em">{subheading}</Text>
       </Heading>
     </VStack>
   );

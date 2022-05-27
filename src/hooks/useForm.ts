@@ -1,6 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ChangeEventHandler,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-const useForm = ({ fields, editValuePresent, onSubmit }: FormProps) => {
+const useForm = ({
+  fields,
+  editValuePresent,
+  onSubmit,
+}: FormProps): FormResponse => {
   const [, forceUpdate] = useState(Date.now());
 
   const _update = useCallback(() => forceUpdate(Date.now()), []);
@@ -21,9 +31,10 @@ const useForm = ({ fields, editValuePresent, onSubmit }: FormProps) => {
     },
     [_update]
   );
+
   const initialize = useCallback(
-    (vals: any) => {
-      const form: Form = { valid: false, invalidFields: [], fields: [] };
+    (vals: Field[]) => {
+      const form: Form = { valid: false, invalidFields: [], fields: {} };
       for (let field of vals) {
         form.fields[field.id] = {
           ...field,
@@ -67,7 +78,7 @@ const useForm = ({ fields, editValuePresent, onSubmit }: FormProps) => {
   };
 
   const reset = useCallback(() => {
-    for (let field of form.current.fields) {
+    for (let field of fields) {
       form.current.fields[field.id] = {
         ...field,
         value: "",
@@ -77,7 +88,7 @@ const useForm = ({ fields, editValuePresent, onSubmit }: FormProps) => {
       form.current.invalidFields.push(field.id);
       form.current.valid = false;
     }
-  }, [handleChange]);
+  }, [handleChange, fields]);
 
   useEffect(() => {
     if (editValuePresent === true) {
@@ -90,11 +101,12 @@ const useForm = ({ fields, editValuePresent, onSubmit }: FormProps) => {
   return {
     ...form.current.fields,
     submit,
-    handleChange,
     reset,
     valid: form.current.valid,
   };
 };
+
+type OnSubmitFn = (a: Form) => void;
 
 interface Field {
   id: string;
@@ -104,14 +116,16 @@ interface Field {
   value?: string | number;
 }
 
-interface InternalField extends Field {
+export interface InternalField extends Field {
   value: string | number;
   valid: boolean;
-  onChange: (event: React.FormEvent<HTMLInputElement>) => void;
+  onChange:
+    | ChangeEventHandler<HTMLTextAreaElement>
+    | ChangeEventHandler<HTMLInputElement>;
 }
 
 interface FormProps {
-  onSubmit: (input: any) => any;
+  onSubmit: OnSubmitFn;
   fields: Field[];
   editValuePresent?: boolean;
 }
@@ -119,7 +133,22 @@ interface FormProps {
 interface Form {
   valid: boolean;
   invalidFields: string[];
-  fields: any;
+  fields: { [key: string]: InternalField };
+}
+
+export interface FormResponse {
+  [key: string]: InternalField | boolean | (() => void);
+  valid: boolean;
+  submit: () => void;
+  reset: () => void;
+}
+
+export interface InternalFieldText extends InternalField {
+  onChange: ChangeEventHandler<HTMLInputElement>;
+}
+
+export interface InternalFieldTextArea extends InternalField {
+  onChange: ChangeEventHandler<HTMLTextAreaElement>;
 }
 
 export default useForm;

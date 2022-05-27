@@ -1,6 +1,19 @@
 import { useNavigate } from "react-router-dom";
-import useForm from "../../hooks/useForm";
+import useForm, {
+  FormResponse,
+  InternalFieldText,
+  InternalFieldTextArea,
+} from "../../hooks/useForm";
 import { useEditPostMutation, useGetPostQuery } from "../api/notes";
+
+interface EditNoteFormResponse extends FormResponse {
+  isError: boolean;
+  isLoading: boolean;
+  title: InternalFieldText;
+  content: InternalFieldTextArea;
+  noteLoading: boolean;
+  noteError: boolean;
+}
 
 const useEditNoteForm = (id: string) => {
   const {
@@ -18,8 +31,8 @@ const useEditNoteForm = (id: string) => {
       } else {
         editPost({
           id,
-          title: title.value,
-          content: content.value,
+          title: `${title.value}`,
+          content: `${content.value}`,
         }).unwrap();
         navigate(`/view/${note?.id}`);
       }
@@ -46,7 +59,7 @@ const useEditNoteForm = (id: string) => {
     noteLoading,
     noteError,
     isError,
-  };
+  } as EditNoteFormResponse;
 };
 
 export { useEditNoteForm };

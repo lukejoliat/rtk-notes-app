@@ -9,12 +9,13 @@ import {
   ListIcon,
   ListItem,
 } from "@chakra-ui/react";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "../components/card/Card";
 import { CardActions } from "../components/card/CardActions";
 import { CardContent } from "../components/card/CardContent";
 import { CardHeader } from "../components/card/CardHeader";
+import { TestComp } from "../components/TestComp";
 import { useDeletePostMutation, useGetPostsQuery } from "../features/api/notes";
 import useInput from "../hooks/useInput";
 
@@ -22,6 +23,7 @@ export interface Note {
   id?: string;
   title: string;
   content?: string;
+  createdAt?: string;
 }
 
 const Notes = () => {
@@ -31,6 +33,15 @@ const Notes = () => {
   }, [error, isError]);
   const [deleteNote] = useDeletePostMutation();
   const search = useInput("");
+
+  const formatDate = (date?: string) => {
+    console.log();
+
+    if (date) {
+      let dt = new Date(date);
+      return `${dt.getMonth()}/${dt.getDate()}/${dt.getFullYear()}`;
+    } else return "";
+  };
 
   const filteredNotes = useMemo(() => {
     if (search.value && notes && notes.length && notes.length > 0) {
@@ -44,13 +55,15 @@ const Notes = () => {
   else
     return (
       <>
-        <Heading>My Notes</Heading>
         <Input type="text" {...search} placeholder="Search Notes..." my={2} />
         <Grid templateColumns="repeat(auto-fill,minmax(250px,1fr))" gap={6}>
           {filteredNotes?.map((n: Note) => (
             <GridItem key={n.id}>
               <Card borderRadius={6} bg="gray.500">
-                <CardHeader heading={n.title} subheading={"Lukes Note"} />
+                <CardHeader
+                  heading={n.title}
+                  subheading={`${formatDate(n?.createdAt)}`}
+                />
                 <CardContent h={100} overflow="hidden">
                   {n.content}
                 </CardContent>
